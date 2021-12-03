@@ -15,12 +15,18 @@ class Decrypt(Resource):
         pass
 
     def post(self):
-        senha = request.form['senha']
+        senha = bytes(request.form['senha'], 'UTF-8')
         link = request.form['link']
-        file_64 = requests.get(link)
+        response = requests.get(link)
+        file_64 = (bytes(response.text, 'UTF-8'))
         file = base64.decodebytes(file_64)
+
         plainbytes = decrypt(file, senha)
-        f = open('temp.bin', 'wb')
+        print(plainbytes.decode('UTF-8'))
+        try:
+            f = open('temp_files/temp.bin', 'xb')
+        except Exception:
+            f = open('temp_files/temp.bin', 'wb')
         f.write(plainbytes)
         f.close()
         return send_file('temp_files/temp.bin')
@@ -35,8 +41,21 @@ def index():
 @app.route('/api/test', methods=['GET'])
 def test():
     f = open('decrypt.py', 'rb')
-    f_64 = base64.encodebytes(f.read())
+    file = f.read()
     f.close()
+
+    key = b'abcdefghijklmnop'
+    print(len(key.decode('UTF-8')))
+    print(len(file.decode('UTF-8')))
+
+    while len(file.decode('UTF-8')) % 16 != 0:
+        file += b' '
+
+    cipher = Cipher(algorithms.AES(key), modes.ECB())
+    encryptor = cipher.encryptor()
+    plainbytes = encryptor.update(file) + encryptor.finalize()
+
+    f_64 = base64.encodebytes(plainbytes)
     return f_64
 
 api.add_resource(Decrypt, '/api/decrypt')

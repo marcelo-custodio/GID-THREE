@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Decifra AES-128 ECB</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Decifra AES-128 ECB</h1>
+</div>
+
+<form id="decipher_form">
+    <input id="link" type="text">
+    <br>
+    <input id="senha" type="text">
+    <br>
+    <input type="submit" value="Enviar">
+</form>
+<script src="static/axios.min.js"></script>
+<script>
+    document.getElementById("decipher_form").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        var formData = new FormData();
+        var file = document.getElementById('link').value;
+        var key = document.getElementById('senha').value;
+
+        formData.append("link", file);
+        formData.append('senha', key)
+
+        axios.post('api/decrypt', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).catch(function(error){
+            console.error(error);
+        });
+    })
+</script>
+{% endblock %}
