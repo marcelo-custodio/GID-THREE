@@ -10,9 +10,9 @@
 >> Utilizado para disponibilizar a interface gráfica da aplicação.
 
 ### Frontend:
-> + Jinja: É um mecanismo de modelos rápido e extensível, que permite substituir *placeholders* com código semelhante a Python. [4]
+> + Jinja: É um mecanismo de modelos rápido e extensível, que permite substituir *placeholders* com código semelhante a Python. [3]
 >> Utilizado para gerar a interface gráfica web.
-> + Axios: É um cliente *HTTP* baseado em promessas para o navegador. [5]
+> + Axios: É um cliente *HTTP* baseado em promessas para o navegador. [4]
 >> Utilizado para realizar as chamadas *HTTP* *client-side* para a *API* *server-side* da aplicação.
 
 -  ## Dificuldades Encontradas
