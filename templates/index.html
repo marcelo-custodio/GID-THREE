@@ -9,6 +9,7 @@
     <h1>Decifra AES-128 ECB</h1>
 </div>
 
+<!-- Entrada da aplicação  -->
 <form id="decipher_form">
     <label for="nome">Nome do Arquivo: </label>
     <input id="nome" type="text">
@@ -19,13 +20,16 @@
     <label for="senha">Senha: </label>
     <input id="senha" type="text">
     <br>
-    <input type="submit" value="Enviar">
+    <input type="submit" value="Decifrar">
 </form>
+
+<!-- Envio das entradas para a API e download da saída da aplicação -->
 <script src="static/axios.min.js"></script>
 <script>
     document.getElementById("decipher_form").addEventListener("submit", function (event) {
         event.preventDefault();
 
+        // Construção do objeto com as entradas da aplicação
         var formData = new FormData();
         var file = document.getElementById('link').value;
         key = document.getElementById('senha').value;
@@ -37,15 +41,16 @@
         if (nome == '') {
             nome = 'file.bin';
         }
-
         formData.append("link", file);
         formData.append('senha', key);
 
+        // Envio das entradas para a API
         axios.post('api/decrypt', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         }).then(function(response){
+            // Parse da resposta da API e download da saída da aplicação
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
