@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, send_file
-from flask_restful import Api, Resource
+from flask import Flask, render_template, request
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import base64
 import requests
@@ -10,33 +9,23 @@ def decrypt(cipherbytes, key):
     plainbytes = decryptor.update(cipherbytes) + decryptor.finalize()
     return plainbytes
 
-class Decrypt(Resource):
-    def get(self):
-        pass
-
-    def post(self):
-        senha = bytes(request.form['senha'], 'UTF-8')
-        link = request.form['link']
-        response = requests.get(link)
-        file_64 = (bytes(response.text, 'UTF-8'))
-        file = base64.decodebytes(file_64)
-
-        plainbytes = decrypt(file, senha)
-        print(plainbytes.decode('UTF-8'))
-        try:
-            f = open('temp_files/temp.bin', 'xb')
-        except Exception:
-            f = open('temp_files/temp.bin', 'wb')
-        f.write(plainbytes)
-        f.close()
-        return send_file('temp_files/temp.bin')
-
 app = Flask(__name__)
-api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
+@app.route('/api/decrypt', methods=['POST'])
+def file():
+    senha = bytes(request.form['senha'], 'UTF-8')
+    
+    link = request.form['link']
+    response = requests.get(link)
+    file_64 = bytes(response.text, 'UTF-8')
+    f = base64.decodebytes(file_64)
+
+    plainbytes = decrypt(f, senha)
+    return plainbytes
 
 @app.route('/api/test', methods=['GET'])
 def test():
@@ -45,10 +34,7 @@ def test():
     f.close()
 
     key = b'abcdefghijklmnop'
-    print(len(key.decode('UTF-8')))
-    print(len(file.decode('UTF-8')))
-
-    while len(file.decode('UTF-8')) % 16 != 0:
+    while len(file.decode('UTF-8')) % len(key.decode('UTF-8')) != 0:
         file += b' '
 
     cipher = Cipher(algorithms.AES(key), modes.ECB())
@@ -57,8 +43,6 @@ def test():
 
     f_64 = base64.encodebytes(plainbytes)
     return f_64
-
-api.add_resource(Decrypt, '/api/decrypt')
 
 if __name__ == '__main__':
     app.run(debug=True)
